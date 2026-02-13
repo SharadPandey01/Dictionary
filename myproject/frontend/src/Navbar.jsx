@@ -49,10 +49,13 @@ function Navbar() {
                     <img
                         src={Logoimg}
                         alt="Home"
-                        title="Sharad's Dictionary"
+                        title="WORDFORGE"
                         className="logo h-full w-full"
                     />
                 </div>
+                <p className="text-[#a5d6a7] font-serif font-bold text-xl md:text-2xl tracking-wide">
+                    WordForge
+                </p>
 
                 <div className="searchcontainer hidden md:flex bg-white rounded-xl flex-row h-[2.5em] text-black pl-2 overflow-hidden border border-transparent focus-within:border-black focus-within:ring-2 focus-within:ring-white">
 
