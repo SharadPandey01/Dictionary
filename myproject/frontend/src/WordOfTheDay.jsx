@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 export default function WordOfTheDay() {
 
     const [wordData, setWordData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saved, setSaved] = useState(false);
+    const { axiosInstance } = useAuth();
 
     useEffect(() => {
         fetchWordOfTheDay();
@@ -12,19 +14,9 @@ export default function WordOfTheDay() {
 
     const fetchWordOfTheDay = async () => {
         try {
-            const response = await fetch(
-                "http://localhost:5000/api/word-of-the-day"
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "No word available");
-            }
-
-            setWordData(data.data || data); 
+            const response = await axiosInstance.get("/word-of-the-day");
+            setWordData(response.data.data || response.data);
             setLoading(false);
-
         } catch (error) {
             console.error(error);
             setLoading(false);
@@ -35,30 +27,13 @@ export default function WordOfTheDay() {
         if (!wordData) return;
 
         try {
-            const response = await fetch(
-                "http://localhost:5000/api/mywords",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        word: wordData.word,
-                        data: wordData,
-                    }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
+            await axiosInstance.post("/mywords", {
+                word: wordData.word,
+                data: wordData
+            });
             setSaved(true);
-
         } catch (error) {
-            alert(error.message);
+            alert(error.response?.data?.error || error.response?.data?.message || "Error saving word");
         }
     };
 

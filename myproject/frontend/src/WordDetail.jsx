@@ -1,9 +1,11 @@
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "./AuthContext";
 
 export default function WordDetail() {
     const location = useLocation();
     const wordData = location.state?.wordData;
+    const { axiosInstance } = useAuth();
 
     const [saved, setSaved] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -16,7 +18,6 @@ export default function WordDetail() {
         );
     }
 
-    // Extract first meaning + first definition safely
     const firstMeaning = wordData.meanings?.[0];
     const firstDefinition = firstMeaning?.definitions?.[0];
 
@@ -24,29 +25,14 @@ export default function WordDetail() {
         try {
             setLoading(true);
 
-            const response = await fetch(
-                "http://localhost:5000/api/mywords",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        word: wordData.word,
-                        data: wordData,
-                    }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Error saving word");
-            }
+            await axiosInstance.post("/mywords", {
+                word: wordData.word,
+                data: wordData
+            });
 
             setSaved(true);
         } catch (error) {
-            alert(error.message);
+            alert(error.response?.data?.error || error.response?.data?.message || "Error saving word");
         } finally {
             setLoading(false);
         }
@@ -55,13 +41,11 @@ export default function WordDetail() {
     return (
         <div className="min-h-screen w-full flex justify-center bg-[#010409] text-white">
             <div className="contentBox w-[95%] h-fit flex flex-col gap-8 justify-center border border-white p-5">
-                
-                {/* Word Title */}
+
                 <div className="WordTitle font-bold text-[2em] p-5 text-center border-2 border-[#70291e]">
                     {wordData.word?.toUpperCase()}
                 </div>
 
-                {/* Word Details */}
                 <div className="WordDetailsSection bg-[#0d1117] flex flex-col p-5">
                     <div className="wordDetailCards flex flex-col gap-4">
 
@@ -102,7 +86,6 @@ export default function WordDetail() {
                     </div>
                 </div>
 
-                {/* Save Button */}
                 <button
                     onClick={SaveNewWord}
                     disabled={saved || loading}

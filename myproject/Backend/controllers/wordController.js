@@ -1,127 +1,115 @@
-const Word = require("../models/Word");
+import mongoose from "mongoose";
+import Word from "../models/Word.js";
+
 const fetchWordFromAPI = async (word) => {
-  const response = await fetch(
-    `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-  );
+  try {
+    const response = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+    );
 
-  if (!response.ok) {
-    throw new Error("Word not found");
+    if (!response.ok) {
+      if (response.status === 404) {
+        const err = new Error("Word not found");
+        err.status = 404;
+        throw err;
+      }
+      const err = new Error("Dictionary service is currently unavailable.");
+      err.status = 503;
+      throw err;
+    }
+
+    const data = await response.json();
+    return data[0];
+  } catch (error) {
+    if (!error.status) {
+      error.status = 503;
+      error.message = "Dictionary service is currently unavailable.";
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  return data[0];
 };
 
-// GET Meaning
-const getMeaning = async (req, res) => {
+const getMeaning = async (req, res, next) => {
   const { word } = req.params;
 
   try {
     const data = await fetchWordFromAPI(word);
     res.json(data);
   } catch (error) {
-    res.status(404).json({ message: "Word not found" });
+    next(error);
   }
 };
 
-// SAVE Word
-const saveWord = async (req, res) => {
+const saveWord = async (req, res, next) => {
   const { word, data } = req.body;
+  const userId = req.user.id;
 
   try {
-    const existing = await Word.findOne({ word });
+    const existing = await Word.findOne({ word, userId });
 
     if (existing) {
-      return res.status(400).json({ message: "Word already saved" });
+      return res.status(400).json({ error: "Word already saved" });
     }
 
-    const newWord = await Word.create({
-      word,
-      data
-    });
+    const newWord = await Word.create({ word, data, userId });
 
     res.status(201).json(newWord);
-
   } catch (error) {
-    res.status(500).json({ message: "Error saving word" });
+    console.error("Error in saveWord:", error);
+    next(error);
   }
 };
 
-
-// GET All Saved Words
-const getSavedWords = async (req, res) => {
+const getSavedWords = async (req, res, next) => {
   try {
-    const words = await Word.find().sort({ createdAt: -1 });
+    const words = await Word.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.json(words);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching saved words" });
+    error.status = 500;
+    error.message = "Error fetching saved words";
+    next(error);
   }
 };
 
-// DELETE Word
-const deleteWord = async (req, res) => {
+const deleteWord = async (req, res, next) => {
   try {
-    const deleted = await Word.findByIdAndDelete(req.params.id);
+    const deleted = await Word.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.id
+    });
 
     if (!deleted) {
-      return res.status(404).json({ message: "Word not found" });
+      return res.status(404).json({ error: "Word not found" });
     }
 
     res.json({ message: "Word deleted successfully" });
-
   } catch (error) {
-    res.status(500).json({ message: "Error deleting word" });
+    error.status = 500;
+    error.message = "Error deleting word";
+    next(error);
   }
 };
 
+const dailyWords = [
+  "serendipity", "ephemeral", "luminescent", "eloquent", "resilient", "enigma", "paradigm",
+  "melancholy", "nostalgia", "quintessential", "ubiquitous", "ineffable", "evanescent", "mellifluous",
+  "sonorous", "halcyon", "labyrinth", "epiphany", "clandestine", "ethereal", "surreptitious",
+  "obfuscate", "solitude", "magnanimous", "effervescent", "cacophony", "serene", "panacea",
+  "pragmatic", "vicarious", "petrichor"
+];
 
-const wordOfTheDay = async (req, res) => {
+const wordOfTheDay = async (req, res, next) => {
   try {
-    const words = await Word.find();
-
-    if (words.length === 0) {
-      return res.status(404).json({ message: "No saved words yet" });
-    }
-
-    const randomIndex = Math.floor(Math.random() * words.length);
-
-    res.json(words[randomIndex].data);
-
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching word of the day" });
-  }
-};
-
-// Random Word (from preset list)
-const randomWord = async (req, res) => {
-  const randomWords = [
-    "serendipity",
-    "ephemeral",
-    "eloquent",
-    "resilient",
-    "lucid",
-    "reverently",
-    "Optimistically",
-    "Flabbergasted"
-  ];
-
-  const random =
-    randomWords[Math.floor(Math.random() * randomWords.length)];
-
-  try {
-    const data = await fetchWordFromAPI(random);
+    const dayOfMonth = new Date().getDate(); // 1 to 31
+    const targetWord = dailyWords[(dayOfMonth - 1) % dailyWords.length];
+    
+    const data = await fetchWordFromAPI(targetWord);
     res.json(data);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching random word" });
+    error.status = 500;
+    error.message = "Error fetching word of the day";
+    next(error);
   }
 };
 
-
-module.exports = {
-  getMeaning,
-  saveWord,
-  getSavedWords,
-  deleteWord,
-  wordOfTheDay,
-  randomWord
-};
+export { getMeaning, saveWord, getSavedWords, deleteWord, wordOfTheDay };

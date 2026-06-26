@@ -1,21 +1,21 @@
-const express = require("express");
-
-const {
+import express from "express";
+import protect from "../middleware/protect.js";
+import {
   getMeaning,
   saveWord,
   getSavedWords,
   wordOfTheDay,
-  randomWord,
   deleteWord
-} = require("../controllers/wordController");
+} from "../controllers/wordController.js";
+
+import { dictionaryLimiter } from "../middleware/rateLimiters.js";
 
 const router = express.Router();
 
-router.get("/define/:word", getMeaning);
-router.post("/mywords", saveWord);
-router.get("/mywords", getSavedWords);
-router.delete("/mywords/:id", deleteWord);
+router.get("/define/:word", dictionaryLimiter, getMeaning);
+router.post("/mywords", protect, saveWord);
+router.get("/mywords", protect, getSavedWords);
+router.delete("/mywords/:id", protect, deleteWord);
 router.get("/word-of-the-day", wordOfTheDay);
-router.get("/random", randomWord);
 
-module.exports = router;
+export default router;

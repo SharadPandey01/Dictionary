@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth } from "./AuthContext";
 
 function Navbar() {
 
@@ -8,28 +10,33 @@ function Navbar() {
 
     const [word, setWord] = useState("");
     const navigate = useNavigate();
+    const { accessToken, setAccessToken, setUsername, axiosInstance } = useAuth();
 
     const getMeaning = async () => {
         const trimmedWord = word.trim();
-        if (!trimmedWord) return;
+        if (!trimmedWord){
+            toast.warn("Word cannot be empty !");
+            return;
+        }
 
         try {
-            const response = await fetch(
-                `http://localhost:5000/api/define/${trimmedWord}`
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Word not found");
-            }
-
-            navigate("/WordDetail", { state: { wordData: data } });
+            const response = await axiosInstance.get(`/define/${trimmedWord}`);
+            navigate("/WordDetail", { state: { wordData: response.data } });
             setWord("");
-
         } catch (error) {
-            alert(error.message);
+            toast.error('Word Not Found !');
+            setWord("");
         }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await axiosInstance.post("/auth/logout");
+        } catch {
+        }
+        setAccessToken(null);
+        setUsername(null);
+        navigate("/login");
     };
 
     const navLinkStyle = ({ isActive }) =>
@@ -93,19 +100,46 @@ function Navbar() {
                     <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
                 </div>
 
-                <div className="group flex flex-col">
-                    <NavLink to="/MyWords" className={navLinkStyle}>
-                        My Words
-                    </NavLink>
-                    <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
-                </div>
+                {accessToken && (
+                    <>
+                        <div className="group flex flex-col">
+                            <NavLink to="/MyWords" className={navLinkStyle}>
+                                My Words
+                            </NavLink>
+                            <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
+                        </div>
 
-                <div className="group flex flex-col">
-                    <NavLink to="/RandomWord" className={navLinkStyle}>
-                        Random Word
-                    </NavLink>
-                    <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
-                </div>
+                        <div className="group flex flex-col">
+                            <NavLink to="/collections" className={navLinkStyle}>
+                                Collections
+                            </NavLink>
+                            <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
+                        </div>
+
+                        <div className="group flex flex-col">
+                            <NavLink to="/dashboard" className={navLinkStyle}>
+                                Dashboard
+                            </NavLink>
+                            <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
+                        </div>
+
+                        <button
+                            onClick={handleLogout}
+                            className="font-serif text-[0.75em] md:text-[1.25em] text-nowrap text-white hover:text-red-400 transition-colors"
+                        >
+                            Logout
+                        </button>
+                    </>
+                )}
+
+                {!accessToken && (
+                    <div className="group flex flex-col">
+                        <NavLink to="/login" className={navLinkStyle}>
+                            Login
+                        </NavLink>
+                        <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
+                    </div>
+                )}
 
             </div>
         </div>
