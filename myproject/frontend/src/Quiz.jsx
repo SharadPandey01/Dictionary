@@ -152,7 +152,7 @@ export default function Quiz() {
                   onClick={() => handleScore(0)}
                   className="border border-red-400 px-4 py-2 text-red-400 hover:text-white"
                 >
-                  Forgot (0)
+                  <p className="h-full p-2">Forgot (0)</p>
                 </button>
                 <button
                   onClick={() => handleScore(2)}

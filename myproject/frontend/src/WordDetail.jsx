@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { useAuth } from "./AuthContext";
 
 export default function WordDetail() {
@@ -37,6 +37,10 @@ export default function WordDetail() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        setSaved(false);
+    }, [wordData.word]);
 
     return (
         <div className="min-h-screen w-full flex justify-center bg-[#010409] text-white">
@@ -95,11 +99,11 @@ export default function WordDetail() {
                             : "bg-blue-600 hover:bg-blue-700"
                     }`}
                 >
-                    {saved
+                    <p className="h-full p-2 bg-green-700 active:bg-green-800">{saved
                         ? "Saved"
                         : loading
                         ? "Saving..."
-                        : "Add to My Words"}
+                        : "Add to My Words"}</p>
                 </button>
             </div>
         </div>

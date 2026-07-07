@@ -101,9 +101,9 @@ export default function MyWords() {
         <div className="flex justify-end">
           <Link
             to="/quiz"
-            className="border border-gray-500 px-4 py-2 text-white hover:text-green-400 text-sm md:text-base"
+            className="border border-gray-500 text-white hover:text-green-400 text-sm md:text-base overflow-hidden"
           >
-            Start Review
+            <p className="h-full p-2 hover:bg-blue-500 hover:text-gray-200 hover:text-shadow-black"> Start Review </p> 
           </Link>
         </div>
 
@@ -136,17 +136,17 @@ export default function MyWords() {
                       <div className="relative">
                         <button
                           onClick={() => setOpenDropdown(openDropdown === item._id ? null : item._id)}
-                          className="text-gray-400 hover:text-white transition-all text-sm md:text-base"
+                          className="text-gray-400 hover:text-white transition-all text-sm md:text-base overflow-hidden"
                         >
-                          + Collection
+                          <p className="h-full p-2 hover:bg-green-700 active:bg-green-800">+ Collection</p>
                         </button>
                         {openDropdown === item._id && (
-                          <div className="absolute right-0 top-full mt-1 bg-[#0d1117] border border-gray-600 z-10 min-w-[150px]">
+                          <div className="absolute  top-full mt-1 bg-[#0d1117] border border-gray-600 z-10 min-w-[150px]">
                             <button
                               onClick={() => assignToCollection(item._id, "")}
                               className="block w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#232730] transition-all"
                             >
-                              None
+                              <p className="h-full w-full hover:bg-green-700 active:bg-green-800 hover:text-white text-center">None</p>
                             </button>
                             {collections.map((col) => (
                               <button
@@ -154,7 +154,7 @@ export default function MyWords() {
                                 onClick={() => assignToCollection(item._id, col._id)}
                                 className="block w-full text-left px-3 py-2 text-sm text-white hover:bg-[#232730] transition-all"
                               >
-                                {col.name}
+                                <p className="h-full w-full hover:bg-green-700 active:bg-green-800 hover:text-white text-center">{col.name}</p>
                               </button>
                             ))}
                           </div>
@@ -163,9 +163,9 @@ export default function MyWords() {
 
                       <button
                         onClick={() => removeWord(item._id)}
-                        className="text-red-400 hover:text-red-600 transition-all text-xl md:text-3xl"
+                        className="text-red-400 hover:text-red-600 transition-all text-sm md:text-base overflow-hidden"
                       >
-                        Remove
+                        <p className="h-full p-2 hover:bg-red-700 hover:text-white">Remove</p>
                       </button>
                     </div>
                   </div>

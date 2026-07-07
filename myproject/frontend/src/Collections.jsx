@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import { ToastContainer,toast } from "react-toastify";
 
 export default function Collections() {
     const [collections, setCollections] = useState([]);
@@ -28,7 +29,13 @@ export default function Collections() {
 
     const createCollection = async (e) => {
         e.preventDefault();
-        if (!newName.trim()) return;
+        if (!newName.trim())
+        {
+            toast.error("Please enter a collection name",{
+                position: 'bottom-right'
+            });
+            return;
+        }
         setCreating(true);
         try {
             const res = await axiosInstance.post("/collections", { name: newName.trim() });
@@ -68,7 +75,7 @@ export default function Collections() {
     }
 
     return (
-        <div className="w-full flex justify-center min-h-screen bg-[#010409] text-white">
+        <div className="w-full flex justify-center min-h-screen bg-[#010409] text-white p-10">
             <div className="w-[95%] h-fit flex flex-col gap-8 border border-white p-5">
 
                 <div className="text-[2em] md:text-5xl font-bold font-serif text-center">
@@ -86,9 +93,9 @@ export default function Collections() {
                     <button
                         type="submit"
                         disabled={creating}
-                        className="bg-blue-600 p-2 hover:bg-blue-700 transition-all"
+                        className="p-2 hover:bg-blue-700 transition-all overflow-hidden"
                     >
-                        {creating ? "Creating..." : "Create"}
+                        <p className=" h-full p-2 bg-green-700 hover:bg-green-600 hover:text-white active:bg-green-800 outline-0"> {creating ? "Creating..." : "Create"} </p>
                     </button>
                 </form>
 
@@ -112,9 +119,9 @@ export default function Collections() {
                                     </span>
                                     <button
                                         onClick={() => deleteCollection(col._id)}
-                                        className="text-red-400 hover:text-red-600 transition-all"
+                                        className="text-red-400 hover:text-red-600 transition-all overflow-hidden"
                                     >
-                                        Delete
+                                        <p className=" h-full p-2 hover:text-white hover:bg-red-700 active:bg-red-800 outline-0">Delete</p>
                                     </button>
                                 </li>
                             ))}
@@ -123,6 +130,7 @@ export default function Collections() {
                 </div>
 
             </div>
+            <ToastContainer />
         </div>
     );
 }

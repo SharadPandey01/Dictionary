@@ -35,11 +35,11 @@ button{
     align-items: center;
 }
 
-button:hover{
+/* button:hover{
     outline: 1px solid white;
     outline-offset: -2px;
     border:none;
-}
+} */
 
 #searchbox:focus{
     outline: none;

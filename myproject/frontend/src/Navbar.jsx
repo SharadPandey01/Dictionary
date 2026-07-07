@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "./AuthContext";
+import logo from '../src/assets/Print.svg';
 
 function Navbar() {
 
@@ -15,7 +16,10 @@ function Navbar() {
     const getMeaning = async () => {
         const trimmedWord = word.trim();
         if (!trimmedWord){
-            toast.warn("Word cannot be empty !");
+            toast.error("Word cannot be empty !",{
+                position:'bottom-right',
+                autoClose:3000,
+            });
             return;
         }
 
@@ -54,7 +58,7 @@ function Navbar() {
 
                 <div className="logocontainer h-[1.5em] w-[1.5em] md:h-[3.5em] md:w-[3.5em]">
                     <img
-                        src={Logoimg}
+                        src={logo}
                         alt="Home"
                         title="WORDFORGE"
                         className="logo h-full w-full"
@@ -77,8 +81,8 @@ function Navbar() {
                         className="outline-none px-2"
                     />
 
-                    <button onClick={getMeaning} className="px-2">
-                        <img src={searchicon} alt="search" className="h-6 w-8" />
+                    <button onClick={getMeaning} className="h-full bg-white p-2 border-0 rounded-lg">
+                        <img src={searchicon} alt="search" className="h-6 w-10" />
                     </button>
                 </div>
             </div>
@@ -125,9 +129,9 @@ function Navbar() {
 
                         <button
                             onClick={handleLogout}
-                            className="font-serif text-[0.75em] md:text-[1.25em] text-nowrap text-white hover:text-red-400 transition-colors"
+                            className="font-serif text-[0.75em] md:text-[1.25em] text-nowrap text-white  transition-colors overflow-hidden hover:outline-0"
                         >
-                            Logout
+                            <p className="p-2 hover:bg-red-700 hover:text-white transition-colors">Logout</p>
                         </button>
                     </>
                 )}

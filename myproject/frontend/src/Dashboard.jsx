@@ -44,7 +44,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="w-full flex justify-center min-h-screen bg-[#010409] text-white">
+    <div className="w-full flex justify-center min-h-screen bg-[#010409] text-white p-10">
       <div className="w-[95%] h-fit flex flex-col gap-8 border border-white p-5">
         <div className="text-[2em] md:text-5xl font-bold font-serif text-center">Dashboard</div>
 

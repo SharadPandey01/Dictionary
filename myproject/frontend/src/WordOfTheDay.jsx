@@ -125,7 +125,11 @@ export default function WordOfTheDay() {
                             : "bg-blue-600 hover:bg-blue-700"
                     }`}
                 >
-                    {saved ? "Saved" : "Add to My Words"}
+                    <p className="h-full p-2 bg-green-700 active:bg-green-800">{saved
+                        ? "Saved"
+                        : loading
+                        ? "Saving..."
+                        : "Add to My Words"}</p>
                 </button>
 
             </div>
