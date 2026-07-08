@@ -44,7 +44,7 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
-              className="bg-[#0d1117] border border-gray-600 p-2 text-white outline-none"
+              className="bg-[#0d1117] border border-gray-600 p-2 text-white text-transform: lowercase outline-none"
             />
           </div>
 

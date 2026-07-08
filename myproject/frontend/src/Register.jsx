@@ -45,7 +45,7 @@ export default function Register() {
               onChange={(e) => setUsername(e.target.value)}
               required
               placeholder="Enter your full name"
-              className="bg-[#0d1117] border border-gray-600 p-2 text-white outline-none"
+              className="bg-[#0d1117] border border-gray-600 p-2 text-white text-transform: lowercase outline-none"
             />
           </div>
 
@@ -57,7 +57,7 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
-              className="bg-[#0d1117] border border-gray-600 p-2 text-white outline-none"
+              className="bg-[#0d1117] border border-gray-600 p-2 text-white text-transform: lowercase outline-none"  //strictly made input lowercase
             />
           </div>
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "./AuthContext";
@@ -11,7 +11,26 @@ function Navbar() {
 
     const [word, setWord] = useState("");
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
     const { accessToken, setAccessToken, setUsername, axiosInstance } = useAuth();
+
+
+const useDeviceSize = () => {
+    const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return [width];
+};
+
+const [width] = useDeviceSize();
+
+const IsMobile = width < 768;
 
     const getMeaning = async () => {
         const trimmedWord = word.trim();
@@ -104,7 +123,7 @@ function Navbar() {
                     <div className="transition-transform duration-300 h-1 w-full bg-gray-600 scale-x-0 group-hover:scale-x-100 origin-center rounded-2xl"></div>
                 </div>
 
-                {accessToken && (
+                {accessToken && !IsMobile && (
                     <>
                         <div className="group flex flex-col">
                             <NavLink to="/MyWords" className={navLinkStyle}>
@@ -135,6 +154,61 @@ function Navbar() {
                         </button>
                     </>
                 )}
+
+{/* for small devices navbar goes beyond viewport width, so i changed ot to hamburger style dropdown */}
+{accessToken && IsMobile && (
+    <div className="relative">
+
+        <button
+            onClick={() => setMenuOpen(prev => !prev)}
+            className="text-white text-3xl"
+        >
+            <p className="h-full p-2">☰</p>
+        </button>
+
+        {menuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-[#232730] border border-gray-600 rounded-lg shadow-lg flex flex-col z-50">
+
+                <NavLink
+                    to="/MyWords"
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-3 text-white text-center hover:bg-gray-700"
+                >
+                    My Words
+                </NavLink>
+
+                <NavLink
+                    to="/collections"
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-3 text-white text-center hover:bg-gray-700"
+                >
+                    Collections
+                </NavLink>
+
+                <NavLink
+                    to="/dashboard"
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-3 text-white text-center hover:bg-gray-700"
+                >
+                    Dashboard
+                </NavLink>
+
+                <button
+                    onClick={() => {
+                        setMenuOpen(false);
+                        handleLogout();
+                    }}
+                    className="text-center px-4 py-3 text-red-400 hover:bg-red-700 hover:text-white"
+                >
+                    Logout
+                </button>
+
+            </div>
+        )}
+
+    </div>
+)}
+        
 
                 {!accessToken && (
                     <div className="group flex flex-col">
